@@ -515,6 +515,13 @@ const run = async (
       const toolbar = calendar.getOption("headerToolbar");
       toolbar.left = "prev,next today${view_to_create ? " add" : ""}" + filterBtn;
       calendar.setOption("headerToolbar", toolbar);
+      // always update 'calendar_view_type' and 'calendar_date' url params
+      const currentUrl = new URL(location.href);
+      const sp = currentUrl.searchParams;
+      sp.set("calendar_view_type", calendar.view.type);
+      sp.set("calendar_date", calendar.getDate());
+      currentUrl.searchParams = sp;
+      history.replaceState(null, "", currentUrl.toString());
     },
     locale: locale,
     headerToolbar: {
@@ -523,7 +530,12 @@ const run = async (
       right: '${calendar_view_options}',
     },
     navLinks: true,
-    initialView: '${initialView}',
+    initialView: '${state.calendar_view_type 
+      ? state.calendar_view_type 
+      : initialView}',
+    ${state.calendar_date 
+      ? `initialDate: new Date('${state.calendar_date}'),` 
+      : ""}
     ${custom_calendar_views ? custom_calendar_views + "," : ""}
     nowIndicator: ${nowIndicator},
     weekNumbers: ${weekNumbers},
